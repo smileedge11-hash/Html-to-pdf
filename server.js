@@ -3,38 +3,81 @@ import puppeteer from "puppeteer";
 
 const app = express();
 
-app.use(express.json({ limit: "20mb" }));
+app.use(express.json({ limit: "50mb" }));
+
+app.get("/", (req, res) => {
+res.send("HTML TO PDF SERVER RUNNING");
+});
 
 app.post("/generate-pdf", async (req, res) => {
-  try {
-    const { html } = req.body;
+try {
 
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox"]
-    });
+```
+const { html } = req.body;
 
-    const page = await browser.newPage();
+if (!html) {
+  return res.status(400).send("Missing HTML");
+}
 
-    await page.setContent(html, {
-      waitUntil: "networkidle0"
-    });
+const browser = await puppeteer.launch({
+  headless: true,
+  args: [
+    "--no-sandbox",
+    "--disable-setuid-sandbox"
+  ]
+});
 
-    await new Promise(r => setTimeout(r, 5000));
+const page = await browser.newPage();
 
-    const pdf = await page.pdf({
-      format: "A4",
-      printBackground: true
-    });
+await page.setViewport({
+  width: 1400,
+  height: 2000
+});
 
-    await browser.close();
+await page.setContent(html, {
+  waitUntil: "networkidle0"
+});
 
-    res.setHeader("Content-Type", "application/pdf");
-    res.send(pdf);
+await new Promise(resolve => setTimeout(resolve, 5000));
 
-  } catch (e) {
-    res.status(500).send(e.toString());
+const pdf = await page.pdf({
+  format: "A4",
+  printBackground: true,
+  margin: {
+    top: "0px",
+    right: "0px",
+    bottom: "0px",
+    left: "0px"
   }
 });
 
-app.listen(process.env.PORT || 3000);
+await browser.close();
+
+res.setHeader(
+  "Content-Type",
+  "application/pdf"
+);
+
+res.send(pdf);
+```
+
+} catch (error) {
+
+```
+console.error(error);
+
+res.status(500).send({
+  error: error.message
+});
+```
+
+}
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+console.log(
+`Server running on port ${PORT}`
+);
+});
