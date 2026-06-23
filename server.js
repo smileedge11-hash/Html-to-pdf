@@ -12,7 +12,6 @@ app.get("/", (req, res) => {
 
 app.post("/generate-pdf", async (req, res) => {
   try {
-
     const html = req.body.html;
 
     const browser = await puppeteer.launch({
@@ -42,18 +41,16 @@ app.post("/generate-pdf", async (req, res) => {
     res.send(pdf);
 
   } catch (err) {
-
     console.error(err);
 
     res.status(500).send(
       err.toString()
     );
-
   }
 });
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+  console.log(`Server running on port ${PORT}`);
 });
