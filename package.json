@@ -1,12 +1,18 @@
 {
 "name": "html-to-pdf",
 "version": "1.0.0",
+"description": "HTML to PDF Generator using Puppeteer",
 "type": "module",
+"main": "server.js",
 "scripts": {
+"postinstall": "npx puppeteer browsers install chrome",
 "start": "node server.js"
 },
 "dependencies": {
 "express": "^4.21.2",
 "puppeteer": "^24.10.2"
+},
+"engines": {
+"node": ">=18"
 }
 }
